@@ -4,14 +4,20 @@ import User from "../models/User.js";
 export const registerUser = async (req, res, next) => {
   try {
     const { name, email, phone, password } = req.body;
+    if(! email || ! name || ! phone || password){
+      return res.status(400).json({
+        success:false,
+        message : "Please provide details "
+      })
+    }
 
     // convert buffer → base64 string
-    const resume = req.file
-      ? `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
-      : null;
+    // const resume = req.file
+    //   ? `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
+    //   : null;
 
     const user = await User.create({
-      name, email, phone, password, role: "user", resume
+      name, email, phone, password, role: "user"
     });
     res.status(201).json({ message: "User registered", user });
   } catch (err) { next(err); }
