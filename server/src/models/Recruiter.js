@@ -15,6 +15,7 @@ const recruiterSchema = new mongoose.Schema(
     hiringNeeds: { type: Number },
     companyLogo: { type: String },
     jobsPosted: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],
+    wallet: { balanace: {type: Number, default: 0} }
   },
   { timestamps: true }
 );

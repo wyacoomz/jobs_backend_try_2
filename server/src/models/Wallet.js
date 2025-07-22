@@ -1,14 +1,11 @@
 import mongoose from "mongoose";
 
-const transactionSchema = new mongoose.Schema(
+const walletSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    amount: { type: Number, required: true },
-    type: { type: String, enum: ["credit", "debit"], required: true },
-    purpose: { type: String, default: "job_post" },
-    reference: String, // Razorpay / PayU order_id
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, unique: true },
+    balance: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Transaction", transactionSchema);
+export default mongoose.model("Wallet", walletSchema);

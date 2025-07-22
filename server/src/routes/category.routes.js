@@ -12,6 +12,7 @@ router.post("/", upload.single("image"), catCtrl.createCategory);
 router.put("/:id", upload.single("image"), catCtrl.updateCategory);
 router.delete("/:id", catCtrl.deleteCategory);
 router.post("/:id/sub", catCtrl.addSubCategory);
+router.get("/:id/sub", catCtrl.getSubCategories);
 router.delete("/:id/sub", catCtrl.removeSubCategory);
 
 export default router;

@@ -45,9 +45,9 @@ export const deleteCategory = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* ADD / REMOVE SUB-CATEGORIES */
+/* ADD / SUB-CATEGORIES */
 export const addSubCategory = async (req, res, next) => {
-  if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
+  // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
   try {
     const cat = await Category.findByIdAndUpdate(
       req.params.id,
@@ -59,8 +59,20 @@ export const addSubCategory = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+
+// SHOW SUBCATEGORY
+
+export const getSubCategories = async (req, res, next) => {
+  try {
+    const cat = await Category.findById(req.params.id);
+    if (!cat) return res.status(404).json({ error: "Category not found" });
+    res.json({ subCategories: cat.subCategories });
+  } catch (err) { next(err); }
+};
+
+// REMOVE SUB CATEGORY
 export const removeSubCategory = async (req, res, next) => {
-  if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
+  // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
   try {
     const cat = await Category.findByIdAndUpdate(
       req.params.id,

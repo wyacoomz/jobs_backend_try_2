@@ -63,6 +63,12 @@ export const myPostedJobs = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// add money to the wallet (fake payment)
+
+export const addMoney = async ( req, res, next ) =>{
+  const { amount } = req.body.amount 
+}
+
 /* USER – SAVE JOB FOR LATER */
 export const saveJob = async (req, res, next) => {
   try {

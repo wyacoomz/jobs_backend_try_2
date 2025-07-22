@@ -10,7 +10,7 @@ import jobRoutes from "./routes/job.routes.js"
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { notFound }     from "./middleware/notFound.middleware.js";
-
+import paymentRoutes from "./routes/payment.routes.js"
 dotenv.config();
 const app = express();
 
