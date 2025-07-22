@@ -1,33 +1,33 @@
-// src/controllers/SubCategoryController.js
-import SubCategory from "../models/SubCategory.js";
-import Category from "../models/Category.js";
+import SubCategory from "../models/subcategory.model.js";
 
-export const createSubCategory = async (req, res, next) => {
-  const { name, category } = req.body;
-  if (!name || !category) return res.status(400).json({ error: "Invalid input" });
-
+export const createSubCategory = async (req, res) => {
+  const { name, parentCategory } = req.body;
   try {
-    const subCat = await SubCategory.create({ name, category });
-    res.status(201).json(subCat);
-  } catch (err) { next(err); }
+    const sub = await SubCategory.create({ name, parentCategory });
+    res.status(201).json(sub);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-export const addSubCategory = async (req, res, next) => {
-  const { name, category } = req.body;
-  const mainCategory = await Category.findById(category);
-  if (!mainCategory) return res.status(404).json({ error: "Category not found" });
-
-  const subCat = await SubCategory.create({ name, category });
-  res.status(201).json(subCat);
+export const getSubCategories = async (_req, res) => {
+  const subs = await SubCategory.find().populate("parentCategory", "name");
+  res.json(subs);
 };
 
-export const removeSubCategory = async (req, res, next) => {
-  const subCat = await SubCategory.findByIdAndDelete(req.params.id);
-  if (!subCat) return res.status(404).json({ error: "Subcategory not found" });
-  res.json({ message: "Subcategory removed" });
+export const updateSubCategory = async (req, res) => {
+  const { name, parentCategory } = req.body;
+  const updated = await SubCategory.findByIdAndUpdate(
+    req.params.id,
+    { name, parentCategory },
+    { new: true }
+  );
+  if (!updated) return res.status(404).json({ error: "SubCategory not found" });
+  res.json(updated);
 };
 
-export const getSubCategoriesByCategory = async (req, res, next) => {
-  const subCategories = await SubCategory.find({ category: req.params.id });
-  res.json(subCategories);
+export const deleteSubcategory = async (req, res) => {
+  const deleted = await SubCategory.findByIdAndDelete(req.params.id);
+  if (!deleted) return res.status(404).json({ error: "SubCategory not found" });
+  res.json({ message: "Subcategory deleted" });
 };

@@ -3,6 +3,11 @@ import User from "./User.js";
 
 const jobSchema = new mongoose.Schema(
   {
+    company: { type: String},
+    jobpost: { type: Number},
+    // experience: {type: String default: "fresher"},
+    location:{},
+    phone: {type: Number},
     recruiter:   { type: mongoose.Schema.Types.ObjectId, ref: "Recruiter", required: true },
     title:       { type: String, required: true },
     description: { type: String, required: true },

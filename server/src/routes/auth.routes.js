@@ -8,6 +8,6 @@ router.post("/register/user",   upload.single("resume"), registerUser);
 router.post("/register/recruiter", upload.single("logo"), registerRecruiter);
 router.post("/login/user",      loginUser);
 router.post("/login/recruiter", loginRecruiter);
-router.post("/login", loginWithPhone);
+router.post("/loginphone", loginWithPhone);
 
 export default router;

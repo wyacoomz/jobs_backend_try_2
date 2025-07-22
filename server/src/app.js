@@ -10,6 +10,7 @@ import jobRoutes from "./routes/job.routes.js"
 import cookieParser from "cookie-parser";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { notFound }     from "./middleware/notFound.middleware.js";
+import subCategoryRoutes from "./routes/subcategory.routes.js"; // ✅ Add this
 import paymentRoutes from "./routes/payment.routes.js"
 dotenv.config();
 const app = express();
@@ -31,7 +32,7 @@ app.use("/api/auth",     authRoutes);
 app.use("/api/user",     userRoutes);
 app.use("/api/recruiter",recruiterRoutes);
 app.use("/api/category", categoryRoutes);
-
+app.use("/api/subcategories", subCategoryRoutes);
 app.use("/api/job", jobRoutes)
 app.use(notFound);
 app.use(errorHandler);

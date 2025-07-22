@@ -1,49 +1,48 @@
-
+// src/controllers/category.controller.js
 import Category from "../models/Category.js";
 
-
-// const adminOnly = (req) => req.user.role === "admin";
-
-// PUBLIC
-export const getCategories = async (_, res, next) => {
+// Create category
+export const createCategory = async (req, res) => {
   try {
-    const cats = await Category.find();
-    res.json(cats);
-  } catch (err) { next(err); }
+    const category = await Category.create({ name: req.body.name });
+    res.status(201).json(category);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-// ADMIN ONLY
-
-// CREATE  (with image)
-export const createCategory = async (req, res, next) => {
-  // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
+// Get all categories
+export const getCategories = async (req, res) => {
   try {
-    const image = req.file ? req.file.path : null;
-    const cat = await Category.create({ ...req.body, image });
-    res.status(201).json(cat);
-  } catch (err) { next(err); }
+    const categories = await Category.find();
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
 
-// UPDATE  (with optional image)
-export const updateCategory = async (req, res, next) => {
-  // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
+// Update category
+export const updateCategory = async (req, res) => {
   try {
-    const image = req.file ? req.file.path : undefined;
-    const updated = await Category.findByIdAndUpdate(
+    const category = await Category.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, ...(image && { image }) },
+      { name: req.body.name },
       { new: true }
     );
-    res.json(updated);
-  } catch (err) { next(err); }
+    if (!category) return res.status(404).json({ error: "Not found" });
+    res.json(category);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 };
 
-// DELETE
-export const deleteCategory = async (req, res, next) => {
-  // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
+// Delete category
+export const deleteCategory = async (req, res) => {
   try {
-    await Category.findByIdAndDelete(req.params.id);
+    const category = await Category.findByIdAndDelete(req.params.id);
+    if (!category) return res.status(404).json({ error: "Not found" });
     res.json({ message: "Deleted" });
-  } catch (err) { next(err); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
-

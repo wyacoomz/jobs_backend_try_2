@@ -1,14 +1,15 @@
-// src/models/Category.js
-import mongoose from "mongoose";
-import SubCategory from "./SubCategory.js"; // Import the new SubCategory model
 
-const categorySchema = new mongoose.Schema(
+import mongoose from "mongoose";
+
+const CategorySchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true },
-    subCategories: [{ type: mongoose.Schema.Types.ObjectId, ref: "SubCategory" }], // Update this line
-    image: { type: String } // base64 URL
+    name: {
+      type: String,
+      required: true,
+      unique: true
+    }
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Category", categorySchema);
+export default mongoose.model("Category", CategorySchema);
