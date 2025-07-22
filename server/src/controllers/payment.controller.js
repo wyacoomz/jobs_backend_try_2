@@ -1,7 +1,7 @@
 import Recruiter from "../models/Recruiter.js";
 import Wallet from "../models/Wallet.js";
 import Transaction from "../models/Transaction.js";
-import Job from "../models/Job.js";
+import Job from "../models/Jobs.js";
 import User from "../models/User.js";
 
 const VIEW_PRICE = 20; // Charge per view of candidate's mobile number
