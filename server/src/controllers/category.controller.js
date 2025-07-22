@@ -1,8 +1,10 @@
+
 import Category from "../models/Category.js";
+import SubCategory from "../models/SubCategory.js";
 
-const adminOnly = (req) => req.user.role === "admin";
+// const adminOnly = (req) => req.user.role === "admin";
 
-/* PUBLIC */
+// PUBLIC
 export const getCategories = async (_, res, next) => {
   try {
     const cats = await Category.find();
@@ -10,9 +12,9 @@ export const getCategories = async (_, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* ADMIN ONLY */
+// ADMIN ONLY
 
-/* CREATE  (with image) */
+// CREATE  (with image)
 export const createCategory = async (req, res, next) => {
   // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
   try {
@@ -22,7 +24,7 @@ export const createCategory = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* UPDATE  (with optional image) */
+// UPDATE  (with optional image)
 export const updateCategory = async (req, res, next) => {
   // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
   try {
@@ -36,7 +38,7 @@ export const updateCategory = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* DELETE */
+// DELETE
 export const deleteCategory = async (req, res, next) => {
   // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
   try {
@@ -45,7 +47,7 @@ export const deleteCategory = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-/* ADD / SUB-CATEGORIES */
+// ADD SUB-CATEGORY to existing category
 export const addSubCategory = async (req, res, next) => {
   // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
   try {
@@ -59,18 +61,7 @@ export const addSubCategory = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-
-// SHOW SUBCATEGORY
-
-export const getSubCategories = async (req, res, next) => {
-  try {
-    const cat = await Category.findById(req.params.id);
-    if (!cat) return res.status(404).json({ error: "Category not found" });
-    res.json({ subCategories: cat.subCategories });
-  } catch (err) { next(err); }
-};
-
-// REMOVE SUB CATEGORY
+// REMOVE SUB-CATEGORY from existing category
 export const removeSubCategory = async (req, res, next) => {
   // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
   try {
@@ -81,5 +72,14 @@ export const removeSubCategory = async (req, res, next) => {
     );
     if (!cat) return res.status(404).json({ error: "Category not found" });
     res.json(cat);
+  } catch (err) { next(err); }
+};
+
+// SHOW SUBCATEGORIES of a category
+export const getSubCategories = async (req, res, next) => {
+  try {
+    const cat = await Category.findById(req.params.id);
+    if (!cat) return res.status(404).json({ error: "Category not found" });
+    res.json({ subCategories: cat.subCategories });
   } catch (err) { next(err); }
 };
