@@ -43,3 +43,22 @@ export const loginWithPhone = async (req, res, next) => {
     res.json({ token, phone: user.phone });
   } catch (err) { next(err); }
 };
+
+
+
+// user and recruiter log in by role 
+
+const loginByRole = async (req, res, role) => {
+  const { phone, password } = req.body;
+  const user = await User.findOne({ phone, role }).select("-password");
+  if (!user) return res.status(404).json({ error: `${role} not found` });
+
+  const match = await user.matchPassword(password);
+  if (!match) return res.status(401).json({ error: "Invalid credentials" });
+
+  const token = user.generateToken();
+  return res.json({ token, user });   // ← full object
+};
+
+export const loginUser =      async (req, res, next) => loginByRole(req, res, "user");
+export const loginRecruiter = async (req, res, next) => loginByRole(req, res, "recruiter");
