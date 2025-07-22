@@ -1,6 +1,6 @@
 
 import Category from "../models/Category.js";
-import SubCategory from "../models/SubCategory.js";
+
 
 // const adminOnly = (req) => req.user.role === "admin";
 
@@ -47,39 +47,3 @@ export const deleteCategory = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// ADD SUB-CATEGORY to existing category
-export const addSubCategory = async (req, res, next) => {
-  // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
-  try {
-    const cat = await Category.findByIdAndUpdate(
-      req.params.id,
-      { $addToSet: { subCategories: req.body.subCategory } },
-      { new: true }
-    );
-    if (!cat) return res.status(404).json({ error: "Category not found" });
-    res.json(cat);
-  } catch (err) { next(err); }
-};
-
-// REMOVE SUB-CATEGORY from existing category
-export const removeSubCategory = async (req, res, next) => {
-  // if (!adminOnly(req)) return res.status(403).json({ error: "Admin only" });
-  try {
-    const cat = await Category.findByIdAndUpdate(
-      req.params.id,
-      { $pull: { subCategories: req.body.subCategory } },
-      { new: true }
-    );
-    if (!cat) return res.status(404).json({ error: "Category not found" });
-    res.json(cat);
-  } catch (err) { next(err); }
-};
-
-// SHOW SUBCATEGORIES of a category
-export const getSubCategories = async (req, res, next) => {
-  try {
-    const cat = await Category.findById(req.params.id);
-    if (!cat) return res.status(404).json({ error: "Category not found" });
-    res.json({ subCategories: cat.subCategories });
-  } catch (err) { next(err); }
-};
