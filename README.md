@@ -88,3 +88,68 @@ Authorization: Bearer <jwt>
 
 
 
+API Endpoints
+
+Authentication
+- POST /api/auth/register/user
+  - Action: Register a new user.
+- POST /api/auth/register/recruiter
+  - Action: Register a new recruiter.
+- POST /api/auth/login
+  - Body: { "phone": "1234567890", "password": "myPassword123" }
+  - Action: Login a user or recruiter and return a JWT token.
+
+Job Posting and Management
+- POST /api/job
+  - Body: { "title": "Job Title", "description": "Job Description", "category": "CategoryId", "subCategory": "SubCat", ... }
+  - Action: Post a new job by a recruiter.
+- GET /api/job
+  - Query Params: keyword, location, category
+  - Action: List or search jobs.
+- GET /api/job/posted
+  - Action: Get all jobs posted by the recruiter.
+- PUT /api/job/:id
+  - Body: Updated job details
+  - Action: Update a job by the recruiter.
+- DELETE /api/job/:id
+  - Action: Delete a job by the recruiter.
+- POST /api/job/:id/view
+  - Action: Recruiter views a candidate's mobile number and is charged ₹20.
+
+User Application Management
+- POST /api/job/:id/apply
+  - Body: { "coverLetter": "Dear Hiring Manager...", "resume": "path/to/resume.pdf" }
+  - Action: Apply to a job as a user.
+- GET /api/job/saved
+  - Action: Get all saved jobs by the user.
+- POST /api/job/:id/save
+  - Action: Save a job for later application by the user.
+- DELETE /api/job/:id/save
+  - Action: Unsave a job by the user.
+- GET /api/job/applied
+  - Action: Get all applied jobs by the user.
+
+Wallet Management
+- POST /api/payment/add-money
+  - Body: { "amount": 500 }
+  - Action: Add money to the recruiter's wallet.
+- GET /api/payment/wallet
+  - Action: Get the recruiter's wallet balance.
+
+Admin-Only Endpoints
+- POST /api/category
+  - Body: { "name": "Technology", "subCategories": ["Backend", "Frontend"] }
+  - Action: Create a new category by admin.
+- PUT /api/category/:id
+  - Body: { "name": "New Tech Name" }
+  - Action: Update an existing category by admin.
+- DELETE /api/category/:id
+  - Action: Delete a category by admin.
+- POST /api/category/:id/sub
+  - Body: { "subCategory": "Cybersecurity" }
+  - Action: Add a new sub-category to an existing category by admin.
+- DELETE /api/category/:id/sub
+  - Body: { "subCategory": "Old SubCat" }
+  - Action: Remove a sub-category from a category by admin.
+
+
