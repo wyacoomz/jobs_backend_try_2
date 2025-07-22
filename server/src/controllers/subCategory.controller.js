@@ -2,6 +2,16 @@
 import SubCategory from "../models/SubCategory.js";
 import Category from "../models/Category.js";
 
+export const createSubCategory = async (req, res, next) => {
+  const { name, category } = req.body;
+  if (!name || !category) return res.status(400).json({ error: "Invalid input" });
+
+  try {
+    const subCat = await SubCategory.create({ name, category });
+    res.status(201).json(subCat);
+  } catch (err) { next(err); }
+};
+
 export const addSubCategory = async (req, res, next) => {
   const { name, category } = req.body;
   const mainCategory = await Category.findById(category);
