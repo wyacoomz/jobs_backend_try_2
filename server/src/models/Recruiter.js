@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 const recruiterSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String,  },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true, minlength: 6 },
     role: { type: String, default: "recruiter" },

@@ -1,3 +1,5 @@
+// job.controller.js  (fully fixed – uses req.account everywhere)
+/* eslint-disable no-unused-vars */
 import Job         from "../models/Jobs.js";
 import Application from "../models/Application.js";
 import User        from "../models/User.js";
@@ -5,32 +7,36 @@ import User        from "../models/User.js";
 /* =========================================================
    JOB CRUD
 ========================================================= */
-// job.controller.js
 export const createJob = async (req, res, next) => {
   try {
-    const job = await Job.create({ ...req.body, recruiter: req.recruiter.id });
+    const job = await Job.create({ ...req.body, recruiter: req.account.id });
     res.status(201).json(job);
   } catch (err) { next(err); }
 };
 
 export const updateJob = async (req, res, next) => {
-  const job = await Job.findOneAndUpdate(
-    { _id: req.params.id, recruiter: req.recruiter.id },
-    req.body,
-    { new: true }
-  );
-  if (!job) return res.status(404).json({ error: "Job not found or not yours" });
-  res.json(job);
+  try {
+    const job = await Job.findOneAndUpdate(
+      { _id: req.params.id, recruiter: req.account.id },
+      req.body,
+      { new: true }
+    );
+    if (!job) return res.status(404).json({ error: "Job not found or not yours" });
+    res.json(job);
+  } catch (err) { next(err); }
 };
 
 export const deleteJob = async (req, res, next) => {
-  const job = await Job.findOneAndDelete({
-    _id: req.params.id,
-    recruiter: req.recruiter.id,
-  });
-  if (!job) return res.status(404).json({ error: "Job not found or not yours" });
-  res.json({ message: "Job deleted" });
+  try {
+    const job = await Job.findOneAndDelete({
+      _id: req.params.id,
+      recruiter: req.account.id,
+    });
+    if (!job) return res.status(404).json({ error: "Job not found or not yours" });
+    res.json({ message: "Job deleted" });
+  } catch (err) { next(err); }
 };
+
 /* =========================================================
    PUBLIC JOB LISTING
 ========================================================= */
@@ -57,7 +63,7 @@ export const getJobs = async (req, res, next) => {
 ========================================================= */
 export const myPostedJobs = async (req, res, next) => {
   try {
-    const jobs = await Job.find({ recruiter: req.user.id });
+    const jobs = await Job.find({ recruiter: req.account.id });
     res.json(jobs);
   } catch (err) { next(err); }
 };
@@ -67,21 +73,21 @@ export const myPostedJobs = async (req, res, next) => {
 ========================================================= */
 export const saveJob = async (req, res, next) => {
   try {
-    await User.findByIdAndUpdate(req.user.id, { $addToSet: { savedJobs: req.params.id } });
+    await User.findByIdAndUpdate(req.account.id, { $addToSet: { savedJobs: req.params.id } });
     res.json({ message: "Job saved" });
   } catch (err) { next(err); }
 };
 
 export const unsaveJob = async (req, res, next) => {
   try {
-    await User.findByIdAndUpdate(req.user.id, { $pull: { savedJobs: req.params.id } });
+    await User.findByIdAndUpdate(req.account.id, { $pull: { savedJobs: req.params.id } });
     res.json({ message: "Job unsaved" });
   } catch (err) { next(err); }
 };
 
 export const getSavedJobs = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id)
+    const user = await User.findById(req.account.id)
       .populate({ path: "savedJobs", populate: { path: "recruiter", select: "name companyName" } });
     res.json(user.savedJobs);
   } catch (err) { next(err); }
@@ -92,16 +98,16 @@ export const getSavedJobs = async (req, res, next) => {
 ========================================================= */
 export const applyJob = async (req, res, next) => {
   try {
-    const exists = await Application.findOne({ job: req.params.id, applicant: req.user.id });
+    const exists = await Application.findOne({ job: req.params.id, applicant: req.account.id });
     if (exists) return res.status(400).json({ error: "Already applied" });
 
-    const user = await User.findById(req.user.id).select("resume");
+    const user = await User.findById(req.account.id).select("resume");
     if (!user || !user.resume)
       return res.status(400).json({ error: "Resume not uploaded" });
 
     const app = await Application.create({
       job: req.params.id,
-      applicant: req.user.id,
+      applicant: req.account.id,
       coverLetter: req.body.coverLetter,
       resume: req.body.resume,
     });
@@ -111,7 +117,7 @@ export const applyJob = async (req, res, next) => {
 
 export const myApplications = async (req, res, next) => {
   try {
-    const apps = await Application.find({ applicant: req.user.id })
+    const apps = await Application.find({ applicant: req.account.id })
       .populate({ path: "job", populate: { path: "recruiter", select: "name companyName" } });
     res.json(apps);
   } catch (err) { next(err); }
@@ -122,7 +128,7 @@ export const myApplications = async (req, res, next) => {
 ========================================================= */
 export const listApplications = async (req, res, next) => {
   try {
-    const job = await Job.findOne({ _id: req.params.id, recruiter: req.user.id });
+    const job = await Job.findOne({ _id: req.params.id, recruiter: req.account.id });
     if (!job) return res.status(404).json({ error: "Job not found or not yours" });
 
     const apps = await Application.find({ job: req.params.id })
@@ -137,7 +143,7 @@ export const listApplications = async (req, res, next) => {
 
 export const viewCandidateMobile = async (req, res, next) => {
   try {
-    const job = await Job.findOne({ _id: req.params.id, recruiter: req.user.id });
+    const job = await Job.findOne({ _id: req.params.id, recruiter: req.account.id });
     if (!job) return res.status(404).json({ error: "Job not found or not yours" });
 
     const apps = await Application.find({ job: req.params.id })
