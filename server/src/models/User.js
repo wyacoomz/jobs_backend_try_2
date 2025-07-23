@@ -1,3 +1,4 @@
+// models/User.js
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -5,13 +6,13 @@ import jwt from "jsonwebtoken";
 const userSchema = new mongoose.Schema(
   {
     name: String,
-    email: { type: String, required: true, unique: true },
+    email: { type: String, unique: true, required: true },
     phone: String,
     DOB: String,
     City: String,
     Qualification: String,
-    Skill: String,
-    password: { type: String },
+    Skill: [String],
+    password: { type: String, required: true },
     role: { type: String, enum: ["user", "recruiter", "admin"], default: "user" },
     resume: { type: String },
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],

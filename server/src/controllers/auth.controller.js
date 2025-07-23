@@ -12,28 +12,62 @@ export const registerUser = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// auth.controller.js
+import Recruiter from "../models/Recruiter.js";
+
 export const registerRecruiter = async (req, res, next) => {
   try {
-    const recruiterFields = { ...req.body, role: "recruiter" };
-    recruiterFields.companyLogo = req.file ? `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}` : null;
-    const recruiter = await User.create(recruiterFields);
+    const payload = { ...req.body, role: "recruiter" };
+    payload.companyLogo = req.file
+      ? `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
+      : null;
+    const recruiter = await Recruiter.create(payload);
     res.status(201).json({ message: "Recruiter registered", recruiter });
-  } catch (err) { next(err); }
+  } catch (err) {
+    next(err);
+  }
 };
+
 
 export const loginWithPhone = async (req, res, next) => {
   try {
-    const { phone, password } = req.body;
-    const user = await User.findOne({ phone }).select("-password");
-    if (!user) return res.status(404).json({ error: "User not found" });
+    const { phone, name } = req.body;
+    let user = await User.findOne({ phone });
 
-    const match = await user.matchPassword(password);
-    if (!match) return res.status(401).json({ error: "Invalid credentials" });
+    if (!user) {
+      // auto-register with phone + name only (no password)
+      user = await User.create({ name, phone, role: "user" });
+    }
 
     const token = user.generateToken();
-    res.json({ token, user }); // Send the full user object
+    res.json({ token, user: { ...user.toObject(), password: undefined } });
+  } catch (err) {
+    next(err);
+  }
+};
+// auth.controller.js
+export const loginUser = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email }).select("+password");
+    if (!user || user.role !== "user") return res.status(404).json({ error: "User not found" });
+    const match = await user.matchPassword(password);
+    if (!match) return res.status(401).json({ error: "Invalid credentials" });
+    const token = user.generateToken();
+    res.json({ token, user: { ...user.toObject(), password: undefined } });
   } catch (err) { next(err); }
 };
 
-export const loginUser = async (req, res, next) => loginWithPhone(req, res, "user");
-export const loginRecruiter = async (req, res, next) => loginWithPhone(req, res, "recruiter");
+export const loginRecruiter = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const recruiter = await Recruiter.findOne({ email }).select("+password");
+    if (!recruiter) return res.status(404).json({ error: "Recruiter not found" });
+    const match = await recruiter.matchPassword(password);
+    if (!match) return res.status(401).json({ error: "Invalid credentials" });
+    const token = recruiter.generateToken();
+    res.json({ token, user: { ...recruiter.toObject(), password: undefined } });
+  } catch (err) {
+    next(err);
+  }
+};

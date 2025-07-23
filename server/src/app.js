@@ -12,6 +12,8 @@ import { errorHandler } from "./middleware/error.middleware.js";
 import { notFound }     from "./middleware/notFound.middleware.js";
 import subCategoryRoutes from "./routes/subcategory.routes.js"; 
 import paymentRoutes from "./routes/payment.routes.js"
+import dashboardRoutes from "./routes/dashboard.routes.js"
+import adminRoutes from "./routes/admin.routes.js";
 dotenv.config();
 const app = express();
 
@@ -27,13 +29,15 @@ app.use(cors({
 app.use(cookieParser());
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
-
+app.use("/api/admin", adminRoutes);
 app.use("/api/auth",     authRoutes);
 app.use("/api/user",     userRoutes);
 app.use("/api/recruiter",recruiterRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/subcategories", subCategoryRoutes);
 app.use("/api/job", jobRoutes)
+app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/payment", paymentRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

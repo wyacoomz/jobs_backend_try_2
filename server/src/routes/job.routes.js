@@ -22,8 +22,8 @@ const router = express.Router();
 router.get("/", getJobs);
 
 // protected
-router.post("/", protect, createJob);            // recruiter
-router.get("/posted", protect, myPostedJobs);    // recruiter
+router.post("/", createJob);            // recruiter
+router.get("/posted", myPostedJobs);    // recruiter
 router.put("/:id", protect, updateJob); // recruiter edit own job
 router.delete("/:id", protect, deleteJob); // recruiter delete own job
 router.post("/:id/save", protect, saveJob);      // user

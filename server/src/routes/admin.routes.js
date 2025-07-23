@@ -1,22 +1,28 @@
+// admin.routes.js
 import express from "express";
-import { protect } from "../middleware/auth.middleware.js";
-import isAdmin from "../middleware/admin.middelware.js";
 import User from "../models/User.js";
-import Recruiter from "../models/Recruiter.js"
-
+import Recruiter from "../models/Recruiter.js";
 
 const router = express.Router();
-router.use(protect, isAdmin);
-//everything below is admin-only
 
-//GET /api/admin/users -> all users 
-
-
-router.get("/users", async (_req, res, next) =>{
-    try{
-        const user = await User.find({}).select("-password");
-        res.json(users);
-    } catch (err) { next(err)}
+// GET /api/admin/users -> all users (password excluded)
+router.get("/users", async (req, res, next) => {
+  try {
+    const users = await User.find().select("-password");
+    res.json(users);
+  } catch (err) {
+    next(err);
+  }
 });
 
-//GET /api/admin/re
+// GET /api/admin/recruiters -> all recruiters (password excluded)
+router.get("/recruiters", async (req, res, next) => {
+  try {
+    const recruiters = await Recruiter.find().select("-password");
+    res.json(recruiters);
+  } catch (err) {
+    next(err);
+  }
+});
+
+export default router;
