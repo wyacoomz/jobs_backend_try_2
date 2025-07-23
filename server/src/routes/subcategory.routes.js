@@ -1,6 +1,6 @@
 import express from "express";
 import { protect,  } from "../middleware/auth.middleware.js";
-import * as subCtrl from "../controllers/SubCategoryController.js";
+import * as subCtrl from "../controllers/subCategory.controller.js";
 
 const router = express.Router();
 
