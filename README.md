@@ -152,5 +152,5 @@ DATABASE MODELS
 
 🛠️ Future Enhancements
 ```
-Real payment gateway
+replace payment gateway keys with live keys 
 Email & SMS notifications
