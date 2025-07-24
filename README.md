@@ -16,9 +16,6 @@ RESTful API built with **Node.js + Express + MongoDB Atlas** and secured via **J
 
 ## 🔐 Environment Variables
 
-PORT=5000
-MONGO_URI=mongodb+srv://abdul:987654321@cluster0.jnpbyp9.mongodb.net/
-JWT_SECRET=987654321
 ---
 
 Feature / Endpoint
