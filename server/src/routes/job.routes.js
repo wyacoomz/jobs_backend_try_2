@@ -16,18 +16,31 @@ import {
 
 const router = express.Router();
 
-// public
+// helpers (inline)
+const recruiterOnly = (req, res, next) =>
+  req.account?.constructor.modelName === "Recruiter"
+    ? next()
+    : res.status(403).json({ error: "Recruiter access required" });
+
+const userOnly = (req, res, next) =>
+  req.account?.constructor.modelName === "User"
+    ? next()
+    : res.status(403).json({ error: "User access required" });
+
+/* ---------------- PUBLIC ---------------- */
 router.get("/", getJobs);
 
-// protected
-router.post("/",       protect, createJob);       // recruiter
-router.get("/posted",  protect, myPostedJobs);    // recruiter
-router.put("/:id",     protect, updateJob);       // recruiter
-router.delete("/:id",  protect, deleteJob);       // recruiter
-router.post("/:id/save",   protect, saveJob);    // user
-router.delete("/:id/save", protect, unsaveJob);   // user
-router.get("/saved",   protect, getSavedJobs);    // user
-router.post("/:id/apply",  protect, applyJob);    // user
-router.get("/applied", protect, myApplications);  // user
+/* ---------------- RECRUITER ONLY -------- */
+router.post("/",        protect, recruiterOnly, createJob);
+router.get("/posted",   protect, recruiterOnly, myPostedJobs);
+router.put("/:id",      protect, recruiterOnly, updateJob);
+router.delete("/:id",   protect, recruiterOnly, deleteJob);
+
+/* ---------------- USER ONLY ------------- */
+router.post("/:id/save",   protect, userOnly, saveJob);
+router.delete("/:id/save", protect, userOnly, unsaveJob);
+router.get("/saved",       protect, userOnly, getSavedJobs);
+router.post("/:id/apply",  protect, userOnly, applyJob);
+router.get("/applied",     protect, userOnly, myApplications);
 
 export default router;

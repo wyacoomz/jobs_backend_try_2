@@ -1,12 +1,13 @@
-// import express, { Router } from "express";
-// import { protect } from "../middleware/auth.middleware.js";
-// import * as payCtrl from "../controllers/payment.controller.js";
+import express from 'express';
+import { protect } from "../middleware/auth.middleware.js";
+import * as payCtrl from "../controllers/payment.controller.js";
 
-// const router = express.Router();
+const router = express.Router();
 
-// router.post("/add-money", protect, payCtrl.addMoney);    // employer tops-up
-// router.post("/post-job",  protect, payCtrl.postJob);     // spend ₹100
-// router.get("/wallet",     protect, payCtrl.wallet);      // balance
-// router.post("/contacted", protect, payCtrl.markContacted); // mark done
-// router.get("/job/:jobId/mobile",protect, payCtrl.viewCandidateMobile ); // to show candidate mobile number to employer
-// export default router;
+
+router.post("/create-wallet-order" , protect, payCtrl.createWalletOrder);
+router.post("/verify-wallet-payment", protect, payCtrl.verifyWalletPayment);
+router.get("/wallet", protect, payCtrl.wallet);
+router.post("/view-mobile/:jobId", protect, payCtrl.viewCandidateMobile);
+
+export default router;
