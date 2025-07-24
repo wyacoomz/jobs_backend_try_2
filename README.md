@@ -16,54 +16,121 @@ RESTful API built with **Node.js + Express + MongoDB Atlas** and secured via **J
 
 ## 🔐 Environment Variables
 
-PORT=5000
-MONGO_URI=mongodb+srv://abdul:987654321@cluster0.jnpbyp9.mongodb.net/
-JWT_SECRET=987654321
 ---
 
 Feature / Endpoint
 
-| Feature / Endpoint               | Method          | Auth      | Role      | Description               |
-| -------------------------------- | --------------- | --------- | --------- | ------------------------- |
-| **Auth**                         |                 |           |           |                           |
-| `/api/auth/register/user`        | POST            | multipart | user      | Register user             |
-| `/api/auth/register/recruiter`   | POST            | multipart | recruiter | Register recruiter        |
-| `/api/auth/login/user`           | POST            | JSON      | user      | Login                     |
-| `/api/auth/login/recruiter`      | POST            | JSON      | recruiter | Login                     |
-| `/api/auth/loginphone`           | POST            | JSON      | any       | OTP login                 |
-| **Admin**                        |                 |           |           |                           |
-| `/api/admin/users`               | GET             | JWT       | admin     | List all users            |
-| `/api/admin/recruiters`          | GET             | JWT       | admin     | List all recruiters       |
-| **Categories & Sub-Categories**  |                 |           |           |                           |
-| `/api/category`                  | GET             | —         | any       | List categories           |
-| `/api/category`                  | POST/PUT/DELETE | JWT       | admin     | CRUD                      |
-| `/api/subcategories`             | GET             | —         | any       | List sub-categories       |
-| `/api/subcategories`             | POST/PUT/DELETE | JWT       | admin     | CRUD                      |
-| **Jobs**                         |                 |           |           |                           |
-| `/api/job`                       | GET             | —         | any       | Public search             |
-| `/api/job`                       | POST            | JWT       | recruiter | Post job (₹20, max 5)     |
-| `/api/job/posted`                | GET             | JWT       | recruiter | My posted jobs            |
-| `/api/job/:id`                   | PUT/DELETE      | JWT       | recruiter | Edit / delete             |
-| `/api/job/:id/applicants`        | GET             | JWT       | recruiter | Free list (name + skills) |
-| `/api/job/:id/mobile`            | GET             | JWT       | recruiter | Paid list (phone)         |
-| **User Actions**                 |                 |           |           |                           |
-| `/api/job/:id/save`              | POST            | JWT       | user      | Save job                  |
-| `/api/job/:id/save`              | DELETE          | JWT       | user      | Un-save job               |
-| `/api/job/saved`                 | GET             | JWT       | user      | Saved jobs                |
-| `/api/job/:id/apply`             | POST            | JWT       | user      | Apply                     |
-| `/api/job/applied`               | GET             | JWT       | user      | Applications              |
-| **Payment & Wallet**             |                 |           |           |                           |
-| `/api/payment/add-money`         | POST            | JWT       | any       | Top-up wallet             |
-| `/api/payment/post-job`          | POST            | JWT       | recruiter | Internal charge           |
-| `/api/payment/wallet`            | GET             | JWT       | any       | Balance                   |
-| `/api/payment/contacted`         | POST            | JWT       | recruiter | Mark contacted            |
-| `/api/payment/job/:jobId/mobile` | GET             | JWT       | recruiter | Unlock phones (₹20)       |
-| **Recruiter Profile**            |                 |           |           |                           |
-| `/api/recruiter`                 | GET             | —         | any       | Stats                     |
-| `/api/recruiter`                 | PUT             | JWT       | recruiter | Edit profile              |
-| **Dashboards**                   |                 |           |           |                           |
-| `/api/dashboard/user`            | GET             | JWT       | user      | savedJobs + appliedJobs   |
-| `/api/dashboard/recruiter`       | GET             | JWT       | recruiter | stats + walletBalance     |
+## 📘 API Endpoints
+
+### 🧑 Auth Routes (`/api/auth`)
+
+| Method | Endpoint                 | Description                     | Auth | Notes                         |
+|--------|--------------------------|---------------------------------|------|-------------------------------|
+| POST   | /register/user           | Register as a user              | ❌   | `multipart/form-data`, file: `resume` |
+| POST   | /register/recruiter      | Register as a recruiter         | ❌   | file: `logo`                  |
+| POST   | /login/user              | Login user with email/password  | ❌   |                               |
+| POST   | /login/recruiter         | Login recruiter with email/pass | ❌   |                               |
+| POST   | /loginphone              | Login with phone number         | ❌   | User only                     |
+
+---
+
+### 🧾 Admin Routes (`/api/admin`)
+
+| Method | Endpoint                 | Description                      | Auth | Notes |
+|--------|--------------------------|----------------------------------|------|-------|
+| GET    | /users                   | Get all users (no passwords)     | 🔒   | Admin access assumed |
+| GET    | /recruiters              | Get all recruiters (no passwords)| 🔒   | Admin access assumed |
+
+---
+
+### 📂 Category Routes (`/api/categories`)
+
+| Method | Endpoint         | Description              | Auth | Notes |
+|--------|------------------|--------------------------|------|-------|
+| POST   | /                | Create new category      | ❌   | Add auth if needed |
+| GET    | /                | Get all categories       | ❌   | |
+| PUT    | /:id             | Update category by ID    | ❌   | |
+| DELETE | /:id             | Delete category by ID    | ❌   | |
+
+---
+
+### 📂 SubCategory Routes (`/api/subcategories`)
+
+| Method | Endpoint         | Description                 | Auth | Notes |
+|--------|------------------|-----------------------------|------|-------|
+| POST   | /                | Create subcategory          | ❌   | |
+| GET    | /                | Get all subcategories       | ❌   | |
+| PUT    | /:id             | Update subcategory by ID    | ❌   | |
+| DELETE | /:id             | Delete subcategory by ID    | ❌   | |
+
+---
+
+### 📋 Job Routes (`/api/jobs`)
+
+| Method | Endpoint              | Description                          | Auth | Role     |
+|--------|-----------------------|--------------------------------------|------|----------|
+| GET    | /                     | Get all public jobs                  | ❌   | Public   |
+| POST   | /                     | Create job                           | ✅   | Recruiter|
+| GET    | /posted               | Get my posted jobs                   | ✅   | Recruiter|
+| PUT    | /:id                  | Update job by ID                     | ✅   | Recruiter|
+| DELETE | /:id                  | Delete job by ID                     | ✅   | Recruiter|
+| POST   | /:id/save             | Save a job                           | ✅   | User     |
+| DELETE | /:id/save             | Unsave a job                         | ✅   | User     |
+| GET    | /saved                | Get saved jobs                       | ✅   | User     |
+| POST   | /:id/apply            | Apply to job                         | ✅   | User     |
+| GET    | /applied              | Get my applied jobs                  | ✅   | User     |
+
+---
+
+### 📈 Dashboard Routes (`/api/dashboard`)
+
+| Method | Endpoint       | Description               | Auth | Role     |
+|--------|----------------|---------------------------|------|----------|
+| GET    | /user          | Get user dashboard data   | ✅   | User     |
+| GET    | /recruiter     | Get recruiter dashboard   | ✅   | Recruiter|
+
+---
+
+### 💳 Payment Routes (`/api/payment`)
+
+| Method | Endpoint                   | Description                       | Auth | Notes     |
+|--------|----------------------------|-----------------------------------|------|-----------|
+| POST   | /create-wallet-order       | Initiate wallet top-up (₹100)     | ✅   |           |
+| POST   | /verify-wallet-payment     | Verify Razorpay payment           | ✅   |           |
+| GET    | /wallet                    | Get current wallet balance        | ✅   |           |
+| POST   | /view-mobile/:jobId        | View candidate mobile number      | ✅   | Deducts ₹100 |
+
+---
+
+### 🧑 Recruiter Routes (`/api/recruiters`)
+
+| Method | Endpoint       | Description                       | Auth | Notes |
+|--------|----------------|-----------------------------------|------|-------|
+| GET    | /              | Get recruiter stats               | ❌   | Public |
+| PUT    | /              | Update recruiter profile          | ✅   | Recruiter |
+
+---
+
+### 👥 User Routes (`/api/users`)
+
+| Method | Endpoint       | Description                     | Auth | Notes |
+|--------|----------------|---------------------------------|------|-------|
+| GET    | /              | Get active user stats/count     | ❌   | Public |
+| GET    | /:id           | Get user details by ID          | ❌   | Public |
+
+---
+
+### ✅ Legend
+
+| Symbol | Meaning                    |
+|--------|-----------------------------|
+| ❌     | No authentication required |
+| ✅     | Authentication required    |
+| 🔒     | Likely Admin-only access   |
+
+---
+
+
 
 
 
