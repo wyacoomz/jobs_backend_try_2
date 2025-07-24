@@ -31,7 +31,7 @@ const userOnly = (req, res, next) =>
 router.get("/", getJobs);
 
 /* ---------------- RECRUITER ONLY -------- */
-router.post("/",        protect, recruiterOnly, createJob);
+
 router.get("/posted",   protect, recruiterOnly, myPostedJobs);
 router.put("/:id",      protect, recruiterOnly, updateJob);
 router.delete("/:id",   protect, recruiterOnly, deleteJob);
