@@ -50,7 +50,7 @@ export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select("+password");
-    if (!user || user.role !== "user") return res.status(404).json({ error: "User not found" });
+    if (!user || user.role !== "user" && user.role !== "admin") return res.status(404).json({ error: "User not found" });
     const match = await user.matchPassword(password);
     if (!match) return res.status(401).json({ error: "Invalid credentials" });
     const token = user.generateToken();
