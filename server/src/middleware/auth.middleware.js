@@ -1,32 +1,49 @@
-// middleware/auth.middleware.js
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import Recruiter from "../models/Recruiter.js";
 
 export const protect = async (req, res, next) => {
-  const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "Not authorized" });
-
   try {
+    let token = null;
+
+    // Try cookie first
+    if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
+    }
+
+    // Fallback to Authorization header
+    if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
+    if (!token) {
+      return res.status(401).json({ error: "Not authorized. No token provided." });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET); // { id, role }
 
     let account;
     switch (decoded.role) {
       case "user":
         account = await User.findById(decoded.id).select("-password");
+        if (!account) return res.status(401).json({ error: "User not found" });
+        req.user = account;
         break;
+
       case "recruiter":
         account = await Recruiter.findById(decoded.id).select("-password");
+        if (!account) return res.status(401).json({ error: "Recruiter not found" });
+        req.recruiter = account;
         break;
+
       default:
-        return res.status(401).json({ error: "Invalid role" });
+        return res.status(403).json({ error: "Invalid role" });
     }
 
-    if (!account) return res.status(401).json({ error: "Account not found" });
-
-    req.account = account;          // generic key
+    req.account = account; // generic access
     next();
-  } catch {
-    res.status(401).json({ error: "Token failed" });
+  } catch (err) {
+    console.error("Auth error:", err.message);
+    res.status(401).json({ error: "Invalid or expired token" });
   }
 };

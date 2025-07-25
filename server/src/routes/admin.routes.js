@@ -7,12 +7,12 @@ import adminOnly from "../middleware/admin.middleware.js"
 
 const router = express.Router();
 
-router.get("/users", adminOnly, async (req, res) => {
+router.get("/users", async (req, res) => {
   const users = await User.find().select("-password");
   res.json(users);
 });
 
-router.get("/recruiters", adminOnly, async (req, res) => {
+router.get("/recruiters", async (req, res) => {
   const recruiters = await Recruiter.find().select("-password");
   res.json(recruiters);
 });
