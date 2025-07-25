@@ -6,13 +6,13 @@ import jwt from "jsonwebtoken";
 const userSchema = new mongoose.Schema(
   {
     name: String,
-    email: { type: String, unique: true, required: true },
+    email: { type: String, unique: true},
     phone: String,
     DOB: String,
     City: String,
     Qualification: String,
     Skill: [String],
-    password: { type: String, required: true },
+    password: { type: String},
     role: { type: String, enum: ["user", "recruiter", "admin"], default: "user" },
     resume: { type: String },
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Job" }],

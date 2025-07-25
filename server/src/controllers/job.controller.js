@@ -24,14 +24,9 @@ const assertUser = (req) => {
 
 /* =========================================================
    JOB CRUD  (recruiter only)
+   NOTE: createJob is intentionally removed – jobs are created
+   only after successful payment in payment.controller.js
 ========================================================= */
-export const createJob = async (req, res, next) => {
-  try {
-    assertRecruiter(req);
-    const job = await Job.create({ ...req.body, recruiter: req.account.id });
-    res.status(201).json(job);
-  } catch (err) { next(err); }
-};
 
 export const updateJob = async (req, res, next) => {
   try {
@@ -72,7 +67,7 @@ export const getJobs = async (req, res, next) => {
         { description: { $regex: keyword, $options: "i" } },
       ];
     if (location) filter.location = { $regex: location, $options: "i" };
-    if (category) filter.category = { $regex: category, $options: "i" };
+    if (category) filter.category = category;
 
     const jobs = await Job.find(filter).populate("recruiter", "name companyName");
     res.json(jobs);
@@ -120,10 +115,18 @@ export const getSavedJobs = async (req, res, next) => {
 
 /* =========================================================
    USER – APPLY / LIST APPLICATIONS  (user only)
+   Decrements jobpost on every apply
 ========================================================= */
 export const applyJob = async (req, res, next) => {
   try {
     assertUser(req);
+
+    const job = await Job.findById(req.params.id);
+    if (!job || !job.isActive)
+      return res.status(404).json({ error: "Job unavailable" });
+    if (job.jobpost <= 0)
+      return res.status(410).json({ error: "Job quota exhausted" });
+
     const exists = await Application.findOne({ job: req.params.id, applicant: req.account.id });
     if (exists) return res.status(400).json({ error: "Already applied" });
 
@@ -131,12 +134,18 @@ export const applyJob = async (req, res, next) => {
     if (!user || !user.resume)
       return res.status(400).json({ error: "Resume not uploaded" });
 
+    // consume one slot
+    job.jobpost -= 1;
+    if (job.jobpost <= 0) job.isActive = false;
+    await job.save();
+
     const app = await Application.create({
       job: req.params.id,
       applicant: req.account.id,
       coverLetter: req.body.coverLetter,
       resume: req.body.resume,
     });
+
     res.status(201).json(app);
   } catch (err) { next(err); }
 };
@@ -168,4 +177,3 @@ export const listApplications = async (req, res, next) => {
     })));
   } catch (err) { next(err); }
 };
-
