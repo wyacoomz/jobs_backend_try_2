@@ -1,6 +1,7 @@
 import express from "express";
-import { registerUser, registerRecruiter, loginWithPhone, loginUser, loginRecruiter, logout } from "../controllers/auth.controller.js";
+import { registerUser, registerRecruiter, loginWithPhone, loginUser, loginRecruiter, logout, getCurrentUser, getCurrentRecruiter } from "../controllers/auth.controller.js";
 import { upload } from "../middleware/upload.middleware.js";
+import { protect } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -11,4 +12,6 @@ router.post("/login/recruiter", loginRecruiter);
 router.post("/loginphone", loginWithPhone);
 router.get("/logout", logout); 
 
+router.get("/me", protect, getCurrentUser); // ✅ fetch current logged-in user
+router.get("/ME", protect, getCurrentRecruiter); // ✅ fetch current logged-in recruiter
 export default router;

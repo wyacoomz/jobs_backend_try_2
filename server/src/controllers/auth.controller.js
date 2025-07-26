@@ -124,3 +124,53 @@ export const loginRecruiter = async (req, res, next) => {
 export const logout = (req, res) => {
   res.clearCookie("token", cookieOptions).json({ message: "Logged out" });
 };
+
+// controllers/authController.js
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    if (!req.user || !req.role) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    res.status(200).json({
+      user: req.user,
+      role: req.role,
+    });
+  } catch (err) {
+    console.error("Get current user error:", err.message);
+    res.status(500).json({ error: "Server error while fetching user" });
+  }
+};
+
+
+// get current recruiter 
+
+// controllers/authController.js
+// Add this right below getCurrentUser
+
+export const getCurrentRecruiter = async (req, res) => {
+  try {
+    // Ensure the logged-in user is actually a recruiter
+    if (!req.user || !req.role || req.role !== "recruiter") {
+      return res.status(401).json({ error: "Not authenticated as recruiter" });
+    }
+
+    // Optionally re-fetch to populate extra fields (e.g., jobs they posted)
+    const recruiter = await Recruiter.findById(req.user._id)
+      // Example: .populate("postedJobs")  // if you have a jobs reference
+      .lean();
+
+    if (!recruiter) {
+      return res.status(404).json({ error: "Recruiter not found" });
+    }
+
+    res.status(200).json({
+      user: recruiter,
+      role: req.role,
+    });
+  } catch (err) {
+    console.error("Get current recruiter error:", err.message);
+    res.status(500).json({ error: "Server error while fetching recruiter" });
+  }
+};
