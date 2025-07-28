@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const jobSchema = new mongoose.Schema(
   {
     company:      { type: String },
-    jobpost:      { type: Number, default: 1 }, // remaining phone views / applications
+    jobpost:      { type: Number }, // remaining phone views / applications
     experience:   { type: String, default: "fresher" },
     location:     { type: String },
     phone:        { type: Number },
