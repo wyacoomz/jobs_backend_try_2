@@ -55,26 +55,60 @@ export const registerRecruiter = async (req, res, next) => {
   }
 };
 
+// helper function to check if the user is already logged in 
+const isLoggedin = (req) => {
+  const token= req.cookies.token;
+  if (!token) return false;
+
+  try {
+    const decoded =jwt.verify(token, process.env.JWT_SECRET);
+    return !!decoded;
+  } catch (err) {
+    return false;
+  }
+
+};
 // Login with Phone (auto-register if not exists)
 export const loginWithPhone = async (req, res, next) => {
-  try {
+   try {
     const { phone, name } = req.body;
-    let user = await User.findOne({ phone });
+    // check if the user is already logged in
+    if (isLoggedin(req)) {
+      // user is already logged in, send thier info to the recruiter 
 
-    if (!user) {
-      user = await User.create({ name, phone, role: "user" });
+      const user = await User.findOne({ phone }).select("+password");
+      if(!user) {
+        return res.status(404).json({ error: "User not found"});
+      }
+
+      res.json ({
+        message: "User already logged in", user: {... user.toObject(), password: undefined },
+      });
+      return;
+    }
+    //  User is not logged in, process with registration or login 
+    let user = await User.findOne ({ phone });
+    
+    if(!user) {
+      // user does not exist, create a new user with name and phone 
+      user= await User.create({ name, phone, role: "user"});
     }
 
+    //Generate a new token for the user
     const token = user.generateToken();
+    // set the token in the cookie and send the user info 
 
-    res.cookie("token", token, cookieOptions).json({
-      token,
-      user: { ...user.toObject(), password: undefined },
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+    res.cookie("token", token, cookieOptions).json({ token, user: { ...user.toObject(), password: undefined},});
+   } catch (err) {
+    next(err)
+   }
+}
+  
+
+
+
+
+
 
 // Login as User
 export const loginUser = async (req, res, next) => {
@@ -127,23 +161,34 @@ export const logout = (req, res) => {
 
 // controllers/authController.js
 
+// controllers/authController.js
+
 export const getCurrentUser = async (req, res) => {
   try {
-    if (!req.user || !req.role) {
+    const token = req.cookies.token;
+    if (!token) {
       return res.status(401).json({ error: "Not authenticated" });
     }
 
-    res.status(200).json({
-      user: req.user,
-      role: req.role,
-    });
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded._id).select("+password");
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.status(200).json({
+        user: { ...user.toObject(), password: undefined },
+        role: user.role,
+      });
+    } catch (err) {
+      return res.status(401).json({ error: "Invalid token" });
+    }
   } catch (err) {
     console.error("Get current user error:", err.message);
     res.status(500).json({ error: "Server error while fetching user" });
   }
 };
-
-
 // get current recruiter 
 
 // controllers/authController.js

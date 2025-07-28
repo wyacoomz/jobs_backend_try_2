@@ -1,8 +1,15 @@
-import razorpay from "razorpay";
+import Razorpay from "razorpay";
 import crypto from "crypto";
 import Job from "../models/Jobs.js";
 import Transaction from "../models/Transaction.js";
 import AdminSettings from "../models/AdminSettings.js";
+import config from "../config/env.config.js";
+
+// Initialize Razorpay
+const razorpay = new Razorpay({
+  key_id: config.RAZORPAY_KEY_ID,
+  key_secret: config.RAZORPAY_KEY_SECRET,
+});
 
 /* -------------------------------------------------- */
 /*  Helpers                                           */

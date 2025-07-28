@@ -130,9 +130,6 @@ export const applyJob = async (req, res, next) => {
     const exists = await Application.findOne({ job: req.params.id, applicant: req.account.id });
     if (exists) return res.status(400).json({ error: "Already applied" });
 
-    const user = await User.findById(req.account.id).select("resume");
-    if (!user || !user.resume)
-      return res.status(400).json({ error: "Resume not uploaded" });
 
     // consume one slot
     job.jobpost -= 1;

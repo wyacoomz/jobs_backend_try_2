@@ -13,5 +13,5 @@ router.post("/loginphone", loginWithPhone);
 router.get("/logout", logout); 
 
 router.get("/me", protect, getCurrentUser); // ✅ fetch current logged-in user
-router.get("/ME", protect, getCurrentRecruiter); // ✅ fetch current logged-in recruiter
+router.get("/ME", getCurrentRecruiter)
 export default router;
