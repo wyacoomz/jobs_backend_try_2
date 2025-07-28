@@ -49,9 +49,9 @@ export const verifyJobPostPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, jobData } = req.body;
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !jobData) {
-      return res.status(400).json({ error: "Missing payment or job data" });
-    }
+    // if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !jobData) {
+    //   return res.status(400).json({ error: "Missing payment or job data" });
+    // }
 
     const generated = crypto
       .createHmac("sha256", config.RAZORPAY_KEY_SECRET)

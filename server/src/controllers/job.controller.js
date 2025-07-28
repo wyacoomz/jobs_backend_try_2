@@ -139,8 +139,7 @@ export const applyJob = async (req, res, next) => {
     const app = await Application.create({
       job: req.params.id,
       applicant: req.account.id,
-      coverLetter: req.body.coverLetter,
-      resume: req.body.resume,
+      
     });
 
     res.status(201).json(app);
