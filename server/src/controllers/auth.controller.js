@@ -159,9 +159,6 @@ export const logout = (req, res) => {
   res.clearCookie("token", cookieOptions).json({ message: "Logged out" });
 };
 
-// controllers/authController.js
-
-// controllers/authController.js
 
 export const getCurrentUser = async (req, res) => {
   try {
