@@ -18,6 +18,11 @@ const razorpay = new Razorpay({
 /* -------------------------------------------------- */
 const VIEW_PRICE = 20; // ₹20 fixed for viewing one phone number
 
+function generateShortReceipt(prefix = "r") {
+  // max 40 characters total
+  return `${prefix}_${Date.now().toString().slice(-10)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
 async function getJobUnitPrice() {
   const settings = await AdminSettings.findOne();
   return settings?.jobPostPrice ?? 20;
@@ -26,7 +31,7 @@ async function getJobUnitPrice() {
 /* -------------------------------------------------- */
 /*  1. Create Razorpay order for JOB POST             */
 /* -------------------------------------------------- */
-export const createJobPostOrder = async (req, res, next) => {
+export const createJobPostOrder = async (req, res) => {
   try {
     const jobPostCount = Number(req.body.jobpost) || 1;
 
@@ -40,7 +45,7 @@ export const createJobPostOrder = async (req, res, next) => {
     const order = await razorpay.orders.create({
       amount: totalAmount * 100, // paisa
       currency: "INR",
-      receipt: `job_${req.user.id}_${Date.now()}`,
+      receipt: generateShortReceipt("job"),
     });
 
     res.json({ order, unitPrice, totalAmount });
@@ -53,7 +58,7 @@ export const createJobPostOrder = async (req, res, next) => {
 /* -------------------------------------------------- */
 /*  2. Verify & store JOB POST payment                */
 /* -------------------------------------------------- */
-export const verifyJobPostPayment = async (req, res, next) => {
+export const verifyJobPostPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature, jobData } = req.body;
 
@@ -98,7 +103,7 @@ export const verifyJobPostPayment = async (req, res, next) => {
 /* -------------------------------------------------- */
 /*  3. Create order for PHONE VIEW                    */
 /* -------------------------------------------------- */
-export const createPhoneViewOrder = async (req, res, next) => {
+export const createPhoneViewOrder = async (req, res) => {
   try {
     const { userId } = req.params;
     if (!userId) {
@@ -108,7 +113,7 @@ export const createPhoneViewOrder = async (req, res, next) => {
     const order = await razorpay.orders.create({
       amount: VIEW_PRICE * 100,
       currency: "INR",
-      receipt: `phone_${userId}_${req.user.id}_${Date.now()}`,
+      receipt: generateShortReceipt("phone"),
     });
 
     res.json({ order, price: VIEW_PRICE });
@@ -121,7 +126,7 @@ export const createPhoneViewOrder = async (req, res, next) => {
 /* -------------------------------------------------- */
 /*  4. Verify PHONE VIEW payment                      */
 /* -------------------------------------------------- */
-export const verifyPhoneViewPayment = async (req, res, next) => {
+export const verifyPhoneViewPayment = async (req, res) => {
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     const { userId } = req.params;
