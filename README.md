@@ -20,68 +20,106 @@ RESTful API built with **Node.js + Express + MongoDB Atlas** and secured via **J
 
 Feature / Endpoint
 
+# 🚀 Job-Portal API Endpoints
 
-## 📘 API Endpoints
-
-### 🔐 Auth Routes
-
-| Method | Endpoint                           | Description                             | Middleware                |
-|--------|------------------------------------|-----------------------------------------|---------------------------|
-| POST   | `/api/auth/register/user`          | Register a new user                     | `upload.single("resume")` |
-| POST   | `/api/auth/register/recruiter`     | Register a new recruiter                | `upload.single("logo")`   |
-| POST   | `/api/auth/login/user`             | Login user                              | —                         |
-| POST   | `/api/auth/login/recruiter`        | Login recruiter                         | —                         |
-| POST   | `/api/auth/loginphone`             | Login user via phone (OTP)              | —                         |
-| GET    | `/api/auth/logout`                 | Logout current user                     | —                         |
-| GET    | `/api/auth/me`                     | Get current user                        | `protect`                 |
-| GET    | `/api/auth/ME`                     | Get current recruiter                   | —                         |
+> Base URL: `http://localhost:5000`
 
 ---
 
-### 👤 User Routes
-
-| Method | Endpoint           | Description               |
-|--------|--------------------|---------------------------|
-| GET    | `/api/users/`      | Count of active users     |
-| GET    | `/api/users/:id`   | Get user profile by ID    |
-
----
-
-### 💼 Job Routes
-
-| Method | Endpoint                   | Description                              | Access       |
-|--------|----------------------------|------------------------------------------|--------------|
-| GET    | `/api/jobs`                | Public job listing with filters          | Public       |
-| GET    | `/api/jobs/saved`          | Get saved jobs for user                  | User         |
-| PUT    | `/api/jobs/save/:id`       | Save a job to user’s saved list          | User         |
-| PUT    | `/api/jobs/unsave/:id`     | Unsave a job                             | User         |
-| GET    | `/api/jobs/mine`           | Get recruiter's posted jobs              | Recruiter    |
-| PUT    | `/api/jobs/:id`            | Update a job (recruiter only)            | Recruiter    |
-| DELETE | `/api/jobs/:id`            | Delete a job                             | Recruiter    |
+## 🔐 Auth
+| Method | Endpoint | Description | Auth |
+|--------|-----------|-------------|------|
+| POST | `/api/auth/register/user` | Register new user | ❌ |
+| POST | `/api/auth/register/recruiter` | Register new recruiter | ❌ |
+| POST | `/api/auth/login/user` | Login as user | ❌ |
+| POST | `/api/auth/login/recruiter` | Login as recruiter | ❌ |
+| POST | `/api/auth/loginphone` | Login / auto-register with phone | ❌ |
+| GET | `/api/auth/logout` | Logout current session | ❌ |
+| GET | `/api/auth/me` | Current user info | ✅ |
+| GET | `/api/auth/ME` | Current recruiter info | ✅ |
 
 ---
 
-### 📄 Application Routes
-
-| Method | Endpoint                    | Description                             | Access     |
-|--------|-----------------------------|-----------------------------------------|------------|
-| POST   | `/api/applications/:id`     | Apply to a job                          | User       |
-| GET    | `/api/applications/mine`    | Get logged-in user’s applications       | User       |
-| GET    | `/api/applications/:id`     | Get applicants for a job                | Recruiter  |
+## 🧑‍💼 Users
+| Method | Endpoint | Description | Auth |
+|--------|-----------|-------------|------|
+| GET | `/api/users` | Count active users | ❌ |
+| GET | `/api/users/:id` | Get user by ID | ❌ |
 
 ---
 
-### 💳 Payment Routes (Razorpay)
+## 🏢 Recruiters
+| Method | Endpoint | Description | Auth |
+|--------|-----------|-------------|------|
+| GET | `/api/recruiters` | Count active recruiters | ❌ |
+| PUT | `/api/recruiters` | Update recruiter profile | ✅ |
 
-| Method | Endpoint                               | Description                                  | Notes                          |
-|--------|----------------------------------------|----------------------------------------------|--------------------------------|
-| POST   | `/api/payments/job/order`              | Create order for job posting                 | Uses dynamic price             |
-| POST   | `/api/payments/job/verify`             | Verify payment & create job                  | Needs `jobData` in request     |
-| POST   | `/api/payments//phone-view/order/:userId`      | Create order for phone number view           | ₹20 fixed                      |
-| POST   | `/api/payments/phone-view/verify/:userId`    | Verify payment & allow view access           | —                              |
+---
 
+## 📂 Categories
+| Method | Endpoint | Description | Auth |
+|--------|-----------|-------------|------|
+| POST | `/api/categories` | Create category | ❌ |
+| GET | `/api/categories` | List all categories | ❌ |
+| PUT | `/api/categories/:id` | Update category | ❌ |
+| DELETE | `/api/categories/:id` | Delete category | ❌ |
+| GET | `/api/categories/:categoryName/jobs` | Jobs by category name | ❌ |
 
+---
 
+## 📁 Sub-Categories
+| Method | Endpoint | Description | Auth |
+|--------|-----------|-------------|------|
+| POST | `/api/subcategories` | Create sub-category | ❌ |
+| GET | `/api/subcategories` | List all sub-categories | ❌ |
+| PUT | `/api/subcategories/:id` | Update sub-category | ❌ |
+| DELETE | `/api/subcategories/:id` | Delete sub-category | ❌ |
+
+---
+
+## 💼 Jobs
+| Method | Endpoint | Description | Auth & Role |
+|--------|-----------|-------------|-------------|
+| GET | `/api/jobs` | Public job listing (filterable) | ❌ |
+| GET | `/api/jobs/posted` | My posted jobs | ✅ Recruiter |
+| PUT | `/api/jobs/:id` | Update my job | ✅ Recruiter |
+| DELETE | `/api/jobs/:id` | Delete my job | ✅ Recruiter |
+| POST | `/api/jobs/:id/save` | Save job | ✅ User |
+| DELETE | `/api/jobs/:id/save` | Unsave job | ✅ User |
+| GET | `/api/jobs/saved` | My saved jobs | ✅ User |
+| POST | `/api/jobs/:id/apply` | Apply for job | ✅ User |
+| GET | `/api/jobs/applied` | My applications | ✅ User |
+| GET | `/api/jobs/:id/applications` | Applicants for job | ✅ Recruiter |
+
+---
+
+## 💳 Payments
+| Method | Endpoint | Description | Auth & Role |
+|--------|-----------|-------------|-------------|
+| POST | `/api/payments/job-post/order` | Create order for job post | ✅ Recruiter |
+| POST | `/api/payments/job-post/verify` | Verify job-post payment | ✅ Recruiter |
+| POST | `/api/payments/phone-view/order/:userId` | Order to view phone | ✅ Recruiter |
+| POST | `/api/payments/phone-view/verify/:userId` | Verify phone-view payment | ✅ Recruiter |
+
+---
+
+## 📊 Dashboard
+| Method | Endpoint | Description | Auth |
+|--------|-----------|-------------|------|
+| GET | `/api/dashboard/user` | User dashboard stats | ✅ |
+| GET | `/api/dashboard/recruiter` | Recruiter dashboard stats | ✅ |
+
+---
+
+## 🛠️ Admin
+| Method | Endpoint | Description | Auth & Role |
+|--------|-----------|-------------|-------------|
+| GET | `/api/admin/users` | List all users | ✅ Admin |
+| GET | `/api/admin/recruiters` | List all recruiters | ✅ Admin |
+| GET | `/api/admin/price/job-post` | Get job-post price | ❌ |
+| PUT | `/api/admin/price/job-post` | Update job-post price | ✅ Admin |
+
+---
 ### ✅ Legend
 
 | Symbol | Meaning                    |
@@ -105,7 +143,6 @@ DATABASE MODELS
 | Application | `models/Application.js` |
 | Category    | `models/Category.js`    |
 | SubCategory | `models/SubCategory.js` |
-| Wallet      | `models/Wallet.js`      |
 | Transaction | `models/Transaction.js` |
 
 🛠️ Future Enhancements
