@@ -55,57 +55,109 @@ export const registerRecruiter = async (req, res, next) => {
   }
 };
 
-// helper function to check if the user is already logged in 
+// // helper function to check if the user is already logged in 
+// const isLoggedin = (req) => {
+//   const token= req.cookies.token;
+//   if (!token) return false;
+
+//   try {
+//     const decoded =jwt.verify(token, process.env.JWT_SECRET);
+//     return !!decoded;
+//   } catch (err) {
+//     return false;
+//   }
+
+// };
+// // Login with Phone (auto-register if not exists)
+// export const loginWithPhone = async (req, res, next) => {
+//    try {
+//     const { phone, name } = req.body;
+//     // check if the user is already logged in
+//     if (isLoggedin(req)) {
+//       // user is already logged in, send thier info to the recruiter 
+
+//       const user = await User.findOne({ phone }).select("+password");
+//       if(!user) {
+//         return res.status(404).json({ error: "User not found"});
+//       }
+
+//       res.json ({
+//         message: "User already logged in", user: {... user.toObject(), password: undefined },
+//       });
+//       return;
+//     }
+//     //  User is not logged in, process with registration or login 
+//     let user = await User.findOne ({ phone });
+    
+//     if(!user) {
+//       // user does not exist, create a new user with name and phone 
+//       user= await User.create({ name, phone, role: "user"});
+//     }
+
+//     //Generate a new token for the user
+//     const token = user.generateToken();
+//     // set the token in the cookie and send the user info 
+
+//     res.cookie("token", token, cookieOptions).json({ token, user: { ...user.toObject(), password: undefined},});
+//    } catch (err) {
+//     next(err)
+//    }
+// }
+  
+
+
 const isLoggedin = (req) => {
-  const token= req.cookies.token;
+  const token = req.cookies.token;
   if (!token) return false;
 
   try {
-    const decoded =jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     return !!decoded;
   } catch (err) {
     return false;
   }
-
 };
-// Login with Phone (auto-register if not exists)
-export const loginWithPhone = async (req, res, next) => {
-   try {
-    const { phone, name } = req.body;
-    // check if the user is already logged in
-    if (isLoggedin(req)) {
-      // user is already logged in, send thier info to the recruiter 
 
-      const user = await User.findOne({ phone }).select("+password");
-      if(!user) {
-        return res.status(404).json({ error: "User not found"});
+export const loginWithPhone = async (req, res, next) => {
+  try {
+    const { phone, name } = req.body;
+
+    // First check if user with this phone exists
+    let user = await User.findOne({ phone });
+
+    // If user is already logged in, send their info
+    if (isLoggedin(req)) {
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
       }
 
-      res.json ({
-        message: "User already logged in", user: {... user.toObject(), password: undefined },
+      return res.json({
+        message: "User already logged in",
+        user: { ...user.toObject(), password: undefined },
       });
-      return;
-    }
-    //  User is not logged in, process with registration or login 
-    let user = await User.findOne ({ phone });
-    
-    if(!user) {
-      // user does not exist, create a new user with name and phone 
-      user= await User.create({ name, phone, role: "user"});
     }
 
-    //Generate a new token for the user
+    // If user doesn't exist, create new one
+    if (!user) {
+      user = await User.create({ name, phone, role: "user" });
+    }
+
+    // Generate a new token
     const token = user.generateToken();
-    // set the token in the cookie and send the user info 
 
-    res.cookie("token", token, cookieOptions).json({ token, user: { ...user.toObject(), password: undefined},});
-   } catch (err) {
-    next(err)
-   }
-}
-  
+    res
+      .cookie("token", token, cookieOptions)
+      .json({ token, user: { ...user.toObject(), password: undefined } });
 
+  } catch (err) {
+    // If the error is a duplicate key error (just in case)
+    if (err.code === 11000 && err.keyPattern?.phone) {
+      return res.status(409).json({ error: "Phone number already in use" });
+    }
 
+    next(err);
+  }
+};
 
 
 
