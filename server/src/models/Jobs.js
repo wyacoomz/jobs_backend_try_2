@@ -5,7 +5,7 @@ const jobSchema = new mongoose.Schema(
   {
     company:      { type: String },
     jobpost:      { type: Number }, // remaining phone views / applications
-    experience:   { type: String, default: "fresher" },
+    experience:   { type: Number},
     location:     { type: String },
     phone:        { type: Number },
     recruiter:    { type: mongoose.Schema.Types.ObjectId, ref: "Recruiter", required: true },
