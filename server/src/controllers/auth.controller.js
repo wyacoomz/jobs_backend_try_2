@@ -12,20 +12,54 @@ const cookieOptions = {
 };
 
 // Register User
+// export const registerUser = async (req, res, next) => {
+//   try {
+//     const { name, email, phone, password } = req.body;
+//     const user = await User.create({
+//       name,
+//       email,
+//       phone,
+//       password,
+//       role: "user",
+//       resume: req.file
+//         ? `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
+//         : null,
+//     });
+//     const token = user.generateToken();
+//     res.cookie("token", token, cookieOptions).status(201).json({
+//       message: "User registered",
+//       token,
+//       user: { ...user.toObject(), password: undefined },
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
+
+
 export const registerUser = async (req, res, next) => {
   try {
-    const { name, email, phone, password } = req.body;
+    const { name, email, phone, password, Skill } = req.body;
+
+    // Convert Skill string to array if needed
+    const parsedSkill = typeof Skill === 'string'
+      ? Skill.split(',').map(s => s.trim())
+      : Array.isArray(Skill) ? Skill : [];
+
     const user = await User.create({
       name,
       email,
       phone,
       password,
+      Skill: parsedSkill,
       role: "user",
       resume: req.file
         ? `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
         : null,
     });
+
     const token = user.generateToken();
+
     res.cookie("token", token, cookieOptions).status(201).json({
       message: "User registered",
       token,
