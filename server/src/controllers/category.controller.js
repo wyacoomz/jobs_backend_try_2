@@ -50,18 +50,63 @@ export const deleteCategory = async (req, res) => {
 
 //  get jobs by category
 
+// export const getJobsByCategory = async (req, res) => {
+//   try {
+//     const { categoryName } = req.params; // get the category name from the url parameter 
+
+//     // query jobs by category name 
+//     const jobs = await Jobs.find({ category: categoryName }).exec();
+
+//     if (jobs.length === 0) {
+//       return res.status(404).json({ error: " No jobs found for this  category" });
+//   }
+//   res.status(200).json(Jobs);
+//     } catch (err) {
+//   res.status(500).json({ error: err.message });
+//   }
+// };
+
+
+// export const getJobsByCategory = async (req, res) => {
+//   try {
+//     const { categoryName } = req.params;
+
+//     const jobs = await Jobs.find({
+//       category: { $regex: new RegExp(`^${categoryName}$`, 'i') }
+//     }).exec();
+
+//     if (jobs.length === 0) {
+//       return res.status(404).json({ error: "No jobs found for this category" });
+//     }
+
+//     res.status(200).json(jobs);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// };
+
 export const getJobsByCategory = async (req, res) => {
   try {
-    const { categoryName } = req.params; // get the category name from the url parameter 
+    const { categoryName } = req.params;
 
-    // query jobs by category name 
-    const jobs = await Jobs.find({ category: categoryName }).exec();
+    // First, find category by name
+    const category = await Category.findOne({
+      name: { $regex: new RegExp(`^${categoryName}$`, 'i') }
+    });
 
-    if (jobs.length === 0) {
-      return res.status(404).json({ error: " No jobs found for this  category" });
-  }
-  res.status(200).json(Jobs);
-    } catch (err) {
-  res.status(500).json({ error: err.message });
+    if (!category) {
+      return res.status(404).json({ error: 'Category not found' });
+    }
+
+    // Then, find jobs by category _id
+    const jobs = await Jobs.find({ category: category._id });
+
+    if (!jobs.length) {
+      return res.status(404).json({ error: 'No jobs found for this category' });
+    }
+
+    res.status(200).json(jobs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

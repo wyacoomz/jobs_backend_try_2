@@ -37,6 +37,7 @@ router.get("/posted",   protect, recruiterOnly, myPostedJobs);
 router.put("/:id",      protect, recruiterOnly, updateJob);
 router.delete("/:id",   protect, recruiterOnly, deleteJob);
 router.get("/:id/applications",protect, recruiterOnly, listApplications);
+
 /* ---------------- USER ONLY ------------- */
 router.post("/:id/save",   protect, userOnly, saveJob);
 router.delete("/:id/save", protect, userOnly, unsaveJob);

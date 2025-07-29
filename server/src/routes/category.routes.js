@@ -10,11 +10,17 @@ import {
 
 const router = express.Router();
 
+router.get("/:categoryName/jobs", getJobsByCategory)
 router.post("/", createCategory);
 router.get("/", getCategories);
 router.put("/:id", updateCategory);
 router.delete("/:id", deleteCategory);
-router.get("/:categoryName/jobs", getJobsByCategory)
+
+// test route 
+router.get('/test', (req, res) => {
+  res.send('Category test route works');
+});
+
 
 
 export default router;
