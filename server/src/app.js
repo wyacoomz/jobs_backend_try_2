@@ -14,6 +14,7 @@ import subCategoryRoutes from "./routes/subcategory.routes.js";
 import paymentRoutes from "./routes/payment.routes.js"
 import dashboardRoutes from "./routes/dashboard.routes.js"
 import adminRoutes from "./routes/admin.routes.js";
+import contactRoutes from "./routes/contact.routes.js";
 dotenv.config();
 const app = express();
 
@@ -38,6 +39,7 @@ app.use("/api/subcategories", subCategoryRoutes);
 app.use("/api/job", jobRoutes)
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/contact", contactRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
