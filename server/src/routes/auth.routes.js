@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, registerRecruiter, loginWithPhone, logout, getCurrentUser, getCurrentRecruiter, login } from "../controllers/auth.controller.js";
+import { registerUser, registerRecruiter, loginWithPhone, logout, getCurrentUser, getCurrentRecruiter, login, loginUser, loginRecruiter } from "../controllers/auth.controller.js";
 import { upload } from "../middleware/upload.middleware.js";
 import { protect } from "../middleware/auth.middleware.js";
 
