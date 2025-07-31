@@ -1,6 +1,9 @@
 // src/controllers/category.controller.js
 import Category from "../models/Category.js";
 import Jobs from "../models/Jobs.js";
+import cloudinary from "../config/cloudinary.js"; // adjust path as needed
+
+
 
 
 // create category with image
@@ -12,14 +15,23 @@ export const createCategory = async (req, res) => {
       return res.status(400).json({ error: "Image is required" });
     }
 
-    const image = req.file.path; // Cloudinary URL
+    // Upload to Cloudinary
+    const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+      folder: "categories",
+    });
 
-    const category = await Category.create({ name, image });
+    const category = await Category.create({
+      name,
+      image: uploadResult.secure_url,
+    });
+
     res.status(201).json(category);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
+
+
 
 // Get all categories
 export const getCategories = async (req, res) => {

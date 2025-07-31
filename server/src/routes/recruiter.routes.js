@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get("/", countActiveRecruiters); // stats
 router.put("/", updateRecruiterProfile) // edit
-router.get("applicants", protect, getUsersForRecruiterJobs) // to get the users who have applied to the job post
+router.get("/applicants", protect, getUsersForRecruiterJobs) // to get the users who have applied to the job post
 
 export default router;
