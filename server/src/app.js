@@ -21,7 +21,8 @@ const app = express();
 
 
 app.use(cors({
-  origin: 'https://jobmilgayi.netlify.app', // update with your frontend URL if needed
+  origin: ['https://jobmilgayi.netlify.app', 'http://localhost:5173'], // update with your frontend URL if needed
+
   credentials: true,
    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
