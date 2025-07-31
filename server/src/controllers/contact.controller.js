@@ -51,7 +51,7 @@ export const createContact = async (req, res, next) => {
 
     const mailOptions = {
       from: process.env.EMAIL_USERNAME,
-      to: "ask7264ss@gmail.com",
+      to: "abhishekmeena9171@gmail.com",
       subject: "New Contact Form Submission",
       html: `
         <h2>New Contact Details</h2>
