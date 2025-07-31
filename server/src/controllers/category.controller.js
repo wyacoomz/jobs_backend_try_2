@@ -101,7 +101,7 @@ export const getJobsByCategory = async (req, res) => {
     // Then, find jobs by category _id
     const jobs = await Jobs.find({ category: category._id });
 
-    if (!jobs.length) {
+    if (!jobs.length ===0) {
       return res.status(404).json({ error: 'No jobs found for this category' });
     }
 
