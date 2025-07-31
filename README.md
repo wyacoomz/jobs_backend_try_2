@@ -145,7 +145,19 @@ DATABASE MODELS
 | SubCategory | `models/SubCategory.js` |
 | Transaction | `models/Transaction.js` |
 
-🛠️ Future Enhancements
-```
-replace payment gateway keys with live keys 
-Email & SMS notifications
+
+
+## 📬 Contact API Routes
+
+| Method | Endpoint            | Description                  | Body Required | Protected |
+|--------|---------------------|------------------------------|---------------|-----------|
+| POST   | `/api/contact`      | Create a new contact message | ✅ Yes        | ❌ No     |
+| GET    | `/api/contact`      | Get all contact messages     | ❌ No         | ❌ No     |
+| GET    | `/api/contact/:id`  | Get a single contact by ID   | ❌ No         | ❌ No     |
+| PUT    | `/api/contact/:id`  | Update a contact by ID       | ✅ Yes        | ❌ No     |
+| DELETE | `/api/contact/:id`  | Delete a contact by ID       | ❌ No         | ❌ No     |
+
+---
+
+
+
