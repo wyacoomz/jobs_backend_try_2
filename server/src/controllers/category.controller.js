@@ -2,10 +2,19 @@
 import Category from "../models/Category.js";
 import Jobs from "../models/Jobs.js";
 
-// Create category
+
+// create category with image
 export const createCategory = async (req, res) => {
   try {
-    const category = await Category.create({ name: req.body.name });
+    const { name } = req.body;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Image is required" });
+    }
+
+    const image = req.file.path; // Cloudinary URL
+
+    const category = await Category.create({ name, image });
     res.status(201).json(category);
   } catch (err) {
     res.status(400).json({ error: err.message });
