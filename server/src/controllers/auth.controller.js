@@ -11,30 +11,7 @@ const cookieOptions = {
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
-// Register User
-// export const registerUser = async (req, res, next) => {
-//   try {
-//     const { name, email, phone, password } = req.body;
-//     const user = await User.create({
-//       name,
-//       email,
-//       phone,
-//       password,
-//       role: "user",
-//       resume: req.file
-//         ? `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
-//         : null,
-//     });
-//     const token = user.generateToken();
-//     res.cookie("token", token, cookieOptions).status(201).json({
-//       message: "User registered",
-//       token,
-//       user: { ...user.toObject(), password: undefined },
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+
 
 
 export const registerUser = async (req, res, next) => {
@@ -89,55 +66,7 @@ export const registerRecruiter = async (req, res, next) => {
   }
 };
 
-// // helper function to check if the user is already logged in 
-// const isLoggedin = (req) => {
-//   const token= req.cookies.token;
-//   if (!token) return false;
 
-//   try {
-//     const decoded =jwt.verify(token, process.env.JWT_SECRET);
-//     return !!decoded;
-//   } catch (err) {
-//     return false;
-//   }
-
-// };
-// // Login with Phone (auto-register if not exists)
-// export const loginWithPhone = async (req, res, next) => {
-//    try {
-//     const { phone, name } = req.body;
-//     // check if the user is already logged in
-//     if (isLoggedin(req)) {
-//       // user is already logged in, send thier info to the recruiter 
-
-//       const user = await User.findOne({ phone }).select("+password");
-//       if(!user) {
-//         return res.status(404).json({ error: "User not found"});
-//       }
-
-//       res.json ({
-//         message: "User already logged in", user: {... user.toObject(), password: undefined },
-//       });
-//       return;
-//     }
-//     //  User is not logged in, process with registration or login 
-//     let user = await User.findOne ({ phone });
-    
-//     if(!user) {
-//       // user does not exist, create a new user with name and phone 
-//       user= await User.create({ name, phone, role: "user"});
-//     }
-
-//     //Generate a new token for the user
-//     const token = user.generateToken();
-//     // set the token in the cookie and send the user info 
-
-//     res.cookie("token", token, cookieOptions).json({ token, user: { ...user.toObject(), password: undefined},});
-//    } catch (err) {
-//     next(err)
-//    }
-// }
-  
 
 
 const isLoggedin = (req) => {
@@ -241,6 +170,40 @@ export const loginRecruiter = async (req, res, next) => {
     next(err);
   }
 };
+
+export const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    let account = await User.findOne({ email }).select("+password");
+    let role = "user";
+
+    if (!account) {
+      account = await Recruiter.findOne({ email }).select("+password");
+      role = "recruiter";
+    }
+
+    if (!account) {
+      return res.status(404).json({ error: "Account not found" });
+    }
+
+    const match = await account.matchPassword(password);
+    if (!match) return res.status(401).json({ error: "Invalid credentials" });
+
+    const token = account.generateToken();
+
+    res.cookie("token", token, cookieOptions).json({
+      token,
+      user: { ...account.toObject(), password: undefined },
+      role: account.role || role, // e.g., "admin", "user", or "recruiter"
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+
 export const logout = (req, res) => {
   res.clearCookie("token", cookieOptions).json({ message: "Logged out" });
 };
