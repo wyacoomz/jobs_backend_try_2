@@ -14,3 +14,17 @@ export const countActiveUsers = async (_, res, next) => {
     res.json({ active });
   } catch (err) { next(err); }
 };
+
+
+export const updateUser = async (req, res, next) => {
+  try{
+    const update ={ ...req.body };
+    //prevent password update 
+    delete update.password;
+    const user = await User.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true, select: "-password"  });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+}
