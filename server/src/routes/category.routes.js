@@ -15,7 +15,8 @@ const router = express.Router();
 router.post("/", upload.single("image"), createCategory); // ✅ Now handles image
 
 router.get("/", getCategories);
-router.put("/:id", updateCategory);
+// router.put("/:id", updateCategory);
+router.put("/:id", upload.single("image"), updateCategory);
 router.delete("/:id", deleteCategory);
 router.get("/:categoryName/jobs", getJobsByCategory);
 
