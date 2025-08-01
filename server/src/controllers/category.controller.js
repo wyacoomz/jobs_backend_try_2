@@ -46,9 +46,19 @@ export const getCategories = async (req, res) => {
 // Update category
 export const updateCategory = async (req, res) => {
   try {
+    const update = { name: req.body.name };
+
+    // If a new image is uploaded, upload to Cloudinary and update image field
+    if (req.file) {
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+        folder: "categories",
+      });
+      update.image = uploadResult.secure_url;
+    }
+
     const category = await Category.findByIdAndUpdate(
       req.params.id,
-      { name: req.body.name },
+      update,
       { new: true }
     );
     if (!category) return res.status(404).json({ error: "Not found" });
